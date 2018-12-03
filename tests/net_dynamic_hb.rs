@@ -104,10 +104,8 @@ fn do_drop_and_readd(cfg: TestConfig) {
             SenderQueue::builder(
                 dhb,
                 node.netinfo.all_ids().filter(|&&them| them != id).cloned(),
-            )
-            .build(node.id)
-        })
-        .build()
+            ).build(node.id)
+        }).build()
         .expect("could not construct test network");
 
     // We will use the first correct node as the node we will remove from and re-add to the network.
@@ -185,8 +183,7 @@ fn do_drop_and_readd(cfg: TestConfig) {
                 } else {
                     // The node has added the pivot node back.
                     pub_keys_add.keys()
-                }
-                .collect();
+                }.collect();
                 assert!(
                     batch.contributions().count() * 3 > expected_participants.len() * 2,
                     "The batch contains less than N - f contributions: {:?}",
@@ -219,8 +216,7 @@ fn do_drop_and_readd(cfg: TestConfig) {
                         .send_input(
                             node_id,
                             Input::Change(Change::NodeChange(pub_keys_add.clone())),
-                        )
-                        .expect("failed to send `Add` input");
+                        ).expect("failed to send `Add` input");
                 }
 
                 ChangeState::Complete(Change::NodeChange(ref pub_keys))
