@@ -9,7 +9,7 @@ use serde_derive::{Deserialize, Serialize};
 
 use super::epoch_state::EpochState;
 use super::{Batch, Error, HoneyBadgerBuilder, Message, Result};
-use {util, Contribution, DistAlgorithm, Fault, FaultKind, NetworkInfo, NodeIdT};
+use {util, util::SubRng, Contribution, DistAlgorithm, Fault, FaultKind, NetworkInfo, NodeIdT};
 
 use super::Params;
 
@@ -91,14 +91,9 @@ where
         self.has_input = true;
         let epoch = self.epoch;
         let step = {
-            let epoch_state = {
-                self.epoch_state_mut(epoch)?;
-                self.epochs.get_mut(&epoch).expect(
-                    "We created the epoch_state in `self.epoch_state_mut(...)` just a moment ago.",
-                )
-            };
-            let rng = &mut self.rng;
-            epoch_state.propose(proposal, rng)?
+            let mut rng = self.rng.sub_rng();
+            let epoch_state = self.epoch_state_mut(epoch)?;
+            epoch_state.propose(proposal, &mut rng)?
         };
         Ok(step.join(self.try_output_batches()?))
     }
