@@ -891,13 +891,13 @@ where
             .algorithm
             .handle_input(input)
             .map_err(CrankError::HandleInput)?;
-        self.process_step(id, &step);
+        self.process_step(id, &step)?;
         Ok(step)
     }
 
     /// Processes a step of a given node. The results of the processing are stored internally in the
     /// test network.
-    pub fn process_step(&mut self, id: D::NodeId, step: &DaStep<D>) {
+    pub fn process_step(&mut self, id: D::NodeId, step: &DaStep<D>) -> Result<(), CrankError<D>> {
         self.message_count = self.message_count.saturating_add(process_step(
             &mut self.nodes,
             id,
@@ -905,7 +905,7 @@ where
             &mut self.messages,
             self.error_on_fault,
         )?);
-        Ok(step)
+        Ok(())
     }
 
     /// Advance the network.
@@ -1106,15 +1106,15 @@ where
                 "The output length of node {:?} is incorrect",
                 node.id()
             );
-            assert!(
-                node.outputs
-                    .iter()
-                    .zip(
-                        expected
-                            .get(node.id())
-                            .expect("outputs don't match the expectation")
-                    ).all(|(a, b)| a.public_eq(b))
-            );
+            assert!(node
+                .outputs
+                .iter()
+                .zip(
+                    expected
+                        .get(node.id())
+                        .expect("outputs don't match the expectation")
+                )
+                .all(|(a, b)| a.public_eq(b)));
         }
     }
 }
